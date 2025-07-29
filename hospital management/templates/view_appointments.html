@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Appointments</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<style>
+    body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+}
+
+.container {
+    text-align: center;
+    padding: 20px;
+}
+
+h1 {
+    margin-bottom: 20px;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+li {
+    margin-bottom: 15px;
+}
+
+label {
+    font-weight: bold;
+    margin-right: 5px;
+}
+
+a {
+    display: inline-block;
+    padding: 5px 10px;
+    background-color: #333;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 3px;
+    margin-right: 5px;
+}
+
+a:hover {
+    background-color: #555;
+}
+
+/* Additional styles for the appointment list */
+.appointment-list {
+    width: 80%; /* Adjust width as needed */
+    margin: 0 auto;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.appointment-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.appointment-list li label {
+    margin-right: 10px;
+}
+
+.appointment-list li a {
+    margin-left: 10px;
+}
+    
+    </style>
+<body>
+    <div class="container">
+        <h1>View Appointments</h1>
+        <ul>
+            {% for appointment in appointments %}
+                <li>
+                    {{ appointment.doctor_name }} - {{ appointment.patient_name }} - {{ appointment.appointment_time }}
+                    <a href="{{ url_for('update_appointment', appointment_id=appointment._id) }}">Edit</a>
+                    <a href="{{ url_for('delete_appointment', appointment_id=appointment._id) }}">Delete</a>
+                </li>
+            {% endfor %}
+        </ul>
+        <a href="{{ url_for('admin_dashboard') }}">Back to Dashboard</a>
+    </div>
+</body>
+</html>

@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <title>Medical Assistance Chatbot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        #chat-container {
+            width: 50%;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        #chat-log {
+            padding: 10px;
+            overflow-y: auto;
+            max-height: 300px;
+        }
+        #chat-input {
+            width: 80%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+        }
+        #send-btn {
+            width: 20%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        #send-btn:hover {
+            background-color: #3e8e41;
+        }
+        #modal-container {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+        #modal-content {
+            background-color: #fff;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 50%;
+            max-height: 80%;
+            overflow-y: auto;
+        }
+        #options-container {
+            margin: 20px;
+        }
+        .option-btn {
+            margin: 10px;
+        }
+        #answers-container {
+            margin: 20px;
+        }
+        .answer-btn {
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <a class="navbar-brand" href="#">Medical Assistance Chatbot</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+    <div id="options-container">
+        <h2>Choose a Topic:</h2>
+        <button class="option-btn btn btn-primary" id="symptoms-btn">Symptoms</button>
+        <button class="option-btn btn btn-primary" id="medication-btn">Medication</button>
+        <button class="option-btn btn btn-primary" id="diet-btn">Diet</button>
+        <button class="option-btn btn btn-primary" id="exercise-btn">Exercise</button>
+        <button class="option-btn btn btn-primary" id="mental-health-btn">Mental Health</button>
+        <button class="option-btn btn btn-primary" id="first-aid-btn">First Aid</button>
+        <button class="option-btn btn btn-primary" id="health-tips-btn">Health Tips</button>
+        <button class="option-btn btn btn-primary" id="diseases-btn">Diseases</button>
+    </div>
+    <div id="answers-container"></div>
+    <div id="chat-container">
+        <div id="chat-log"></div>
+        <input id="chat-input" type="text" placeholder="Type your message...">
+        <button id="send-btn">Send</button>
+    </div>
+    <div id="modal-container">
+        <div id="modal-content">
+            <h2>Additional Information</h2>
+            <p id="modal-text"></p>
+            <button id="close-modal">Close</button>
+        </div>
+    </div>
+    <script>
+        const chatLog = document.getElementById('chat-log');
+        const chatInput = document.getElementById('chat-input');
+        const sendBtn = document.getElementById('send-btn');
+        const modalContainer = document.getElementById('modal-container');
+        const modalContent = document.getElementById('modal-content');
+        const closeModal = document.getElementById('close-modal');
+        const modalText = document.getElementById('modal-text');
+        const symptomsBtn = document.getElementById('symptoms-btn');
+        const medicationBtn = document.getElementById('medication-btn');
+        const dietBtn = document.getElementById('diet-btn');
+        const exerciseBtn = document.getElementById('exercise-btn');
+        const mentalHealthBtn = document.getElementById('mental-health-btn');
+        const firstAidBtn = document.getElementById('first-aid-btn');
+        const healthTipsBtn = document.getElementById('health-tips-btn');
+        const diseasesBtn = document.getElementById('diseases-btn');
+        const answersContainer = document.getElementById('answers-container');
+
+        let messages = [];
+        let currentTopic = '';
+
+        const topics = {
+            'symptoms': [
+                'Headache',
+                'Fever',
+                'Cold',
+                'Flu',
+                'Fatigue',
+                'Nausea',
+                'Diarrhea',
+                'Constipation'
+            ],
+            'medication': [
+                'Pain relievers',
+                'Antibiotics',
+                'Vitamins',
+                'Supplements',
+                'Antidepressants',
+                'Antihistamines',
+                'Decongestants'
+            ],
+            'diet': [
+                'Healthy eating',
+                'Weight loss',
+                'Weight gain',
+                'Nutrition',
+                'Vegan diet',
+                'Vegetarian diet',
+                'Low-carb diet',
+                'Keto diet'
+            ],
+            'exercise': [
+                'Cardio',
+                'Strength training',
+                'Yoga',
+                'Pilates',
+                'Running',
+                'Swimming',
+                'Cycling',
+                'Dancing'
+            ],
+            'mental-health': [
+                'Anxiety',
+                'Depression',
+                'Stress management',
+                'Self-care',
+                'Mindfulness',
+                'Meditation',
+                'Cognitive behavioral therapy'
+            ],
+            'first-aid': [
+                'Bleeding control',
+                'Burn care',
+                'Sprains and strains',
+                'Fractures',
+                'Cardiac arrest',
+                'Choking',
+                'Allergic reactions'
+            ],
+            'health-tips': [
+                'Hydration',
+                'Sleep',
+                'Exercise',
+                'Nutrition',
+                'Stress management',
+                'Self-care',
+                'Mental health'
+            ],
+            'diseases': [
+                'Diabetes',
+                'Hypertension',
+                'Heart disease',
+                'Cancer',
+                'Alzheimer\'s disease',
+                'Parkinson\'s disease',
+                'Multiple sclerosis'
+            ]
+        };
+
+        const answers = {
+            'symptoms': {
+                'headache': 'A headache can be caused by various factors, including stress, dehydration, or sinus pressure. Try drinking water, taking a break, or using over-the-counter pain relievers.',
+                'fever': 'A fever can be a sign of infection. Make sure to drink plenty of fluids, get rest, and consider taking medication to reduce the fever.',
+                'cold': 'The common cold is a viral infection that can be treated with rest, hydration, and over-the-counter medications. Try using a humidifier, drinking warm liquids, and taking decongestants.',
+                'flu': 'The flu is a viral infection that can be treated with rest, hydration, and over-the-counter medications. Try using a humidifier, drinking warm liquids, and taking decongestants.',
+                'fatigue': 'Fatigue can be caused by various factors, including lack of sleep, poor nutrition, or underlying medical conditions. Try getting enough rest, eating a balanced diet, and exercising regularly.',
+                'nausea': 'Nausea can be caused by various factors, including food poisoning, motion sickness, or underlying medical conditions. Try drinking plenty of fluids, taking anti-nausea medication, and eating small, frequent meals.',
+                'diarrhea': 'Diarrhea can be caused by various factors, including food poisoning, viral infections, or underlying medical conditions. Try drinking plenty of fluids, taking anti-diarrheal medication, and eating small, frequent meals.',
+                'constipation': 'Constipation can be caused by various factors, including poor diet, lack of exercise, or underlying medical conditions. Try drinking plenty of fluids, taking fiber supplements, and exercising regularly.'
+            },
+            'medication': {
+                'pain relievers': 'Pain relievers can help alleviate symptoms of pain and discomfort. However, it is essential to follow the recommended dosage and consult with a doctor before taking any medication.',
+                'antibiotics': 'Antibiotics are used to treat bacterial infections. However, it is essential to follow the recommended dosage and consult with a doctor before taking any medication.',
+                'vitamins': 'Vitamins are essential for maintaining good health. However, it is essential to follow the recommended dosage and consult with a doctor before taking any vitamin supplements.',
+                'supplements': 'Supplements can help fill nutritional gaps in your diet. However, it is essential to follow the recommended dosage and consult with a doctor before taking any supplements.',
+                'antidepressants': 'Antidepressants are used to treat depression and anxiety. However, it is essential to follow the recommended dosage and consult with a doctor before taking any medication.',
+                'antihistamines': 'Antihistamines are used to treat allergies and itching. However, it is essential to follow the recommended dosage and consult with a doctor before taking any medication.',
+                'decongestants': 'Decongestants are used to treat congestion and sinus pressure. However, it is essential to follow the recommended dosage and consult with a doctor before taking any medication.'
+            },
+            'diet': {
+                'healthy eating': 'Healthy eating is essential for maintaining good health. Try to eat a balanced diet that includes plenty of fruits, vegetables, whole grains, and lean protein.',
+                'weight loss': 'Weight loss can be achieved through a combination of healthy eating and regular exercise. Try to eat a balanced diet and engage in physical activity for at least 30 minutes per day.',
+                'weight gain': 'Weight gain can be achieved through a combination of healthy eating and regular exercise. Try to eat a balanced diet and engage in physical activity for at least 30 minutes per day.',
+                'nutrition': 'Nutrition is essential for maintaining good health. Try to eat a balanced diet that includes plenty of fruits, vegetables, whole grains, and lean protein.',
+                'vegan diet': 'A vegan diet can be a healthy option for those who choose to avoid animal products. However, it is essential to ensure that you are getting enough protein, iron, and other essential nutrients.',
+                'vegetarian diet': 'A vegetarian diet can be a healthy option for those who choose to avoid meat. However, it is essential to ensure that you are getting enough protein, iron, and other essential nutrients.',
+                'low-carb diet': 'A low-carb diet can be a healthy option for those who want to lose weight or manage blood sugar. However, it is essential to ensure that you are getting enough fiber and other essential nutrients.',
+                'keto diet': 'A keto diet can be a healthy option for those who want to lose weight or manage blood sugar. However, it is essential to ensure that you are getting enough fiber and other essential nutrients.'
+            },
+            'exercise': {
+                'cardio': 'Cardio exercises can help improve heart health and increase endurance. Try to engage in cardio activities for at least 30 minutes per day.',
+                'strength training': 'Strength training can help improve muscle mass and bone density. Try to engage in strength training activities for at least 30 minutes per day.',
+                'yoga': 'Yoga can help improve flexibility and reduce stress. Try to engage in yoga activities for at least 30 minutes per day.',
+                'pilates': 'Pilates can help improve core strength and flexibility. Try to engage in pilates activities for at least 30 minutes per day.',
+                'running': 'Running can help improve cardiovascular health and increase endurance. Try to engage in running activities for at least 30 minutes per day.',
+                'swimming': 'Swimming can help improve cardiovascular health and increase endurance. Try to engage in swimming activities for at least 30 minutes per day.',
+                'cycling': 'Cycling can help improve cardiovascular health and increase endurance. Try to engage in cycling activities for at least 30 minutes per day.',
+                'dancing': 'Dancing can help improve cardiovascular health and increase endurance. Try to engage in dancing activities for at least 30 minutes per day.'
+            },
+            'mental-health': {
+                'anxiety': 'Anxiety is a common mental health condition that can be managed with therapy, medication, and self-care. Try to engage in stress-reducing activities, such as meditation or deep breathing exercises.',
+                'depression': 'Depression is a common mental health condition that can be managed with therapy, medication, and self-care. Try to engage in stress-reducing activities, such as meditation or deep breathing exercises.',
+                'stress management': 'Stress management is essential for maintaining good mental health. Try to engage in stress-reducing activities, such as meditation or deep breathing exercises.',
+                'self-care': 'Self-care is essential for maintaining good mental health. Try to engage in activities that bring you joy and help you relax, such as reading or taking a bath.',
+                'mindfulness': 'Mindfulness is a technique that can help improve mental health by increasing awareness and reducing stress. Try to engage in mindfulness activities, such as meditation or deep breathing exercises.',
+                'meditation': 'Meditation is a technique that can help improve mental health by increasing awareness and reducing stress. Try to engage in meditation activities, such as guided meditation or mindfulness exercises.',
+                'cognitive behavioral therapy': 'Cognitive behavioral therapy is a type of therapy that can help manage mental health conditions, such as anxiety or depression. Try to consult with a mental health professional to learn more about cognitive behavioral therapy.'
+            },
+            'first-aid': {
+                'bleeding control': 'Bleeding control is essential for treating injuries. Try to apply pressure to the wound and elevate the affected area above heart level.',
+                'burn care': 'Burn care is essential for treating burns. Try to cool the burn with cool water and apply a topical antibiotic ointment.',
+                'sprains and strains': 'Sprains and strains can be treated with rest, ice, compression, and elevation. Try to avoid putting weight on the affected area and seek medical attention if the pain persists.',
+                'fractures': 'Fractures can be treated with immobilization and pain management. Try to seek medical attention immediately if you suspect a fracture.',
+                'cardiac arrest': 'Cardiac arrest is a life-threatening condition that requires immediate medical attention. Try to call emergency services and begin CPR if the person is unresponsive.',
+                'choking': 'Choking is a life-threatening condition that requires immediate medical attention. Try to call emergency services and perform the Heimlich maneuver if the person is conscious.',
+                'allergic reactions': 'Allergic reactions can be treated with antihistamines and epinephrine. Try to seek medical attention immediately if you experience symptoms of an allergic reaction.'
+            },
+            'health-tips': {
+                'hydration': 'Hydration is essential for maintaining good health. Try to drink at least 8 cups of water per day.',
+                'sleep': 'Sleep is essential for maintaining good health. Try to get at least 7 hours of sleep per night.',
+                'exercise': 'Exercise is essential for maintaining good health. Try to engage in physical activity for at least 30 minutes per day.',
+                'nutrition': 'Nutrition is essential for maintaining good health. Try to eat a balanced diet that includes plenty of fruits, vegetables, whole grains, and lean protein.',
+                'stress management': 'Stress management is essential for maintaining good health. Try to engage in stress-reducing activities, such as meditation or deep breathing exercises.',
+                'self-care': 'Self-care is essential for maintaining good health. Try to engage in activities that bring you joy and help you relax, such as reading or taking a bath.',
+                'mental health': 'Mental health is essential for maintaining good health. Try to engage in activities that promote mental well-being, such as therapy or mindfulness exercises.'
+            },
+            'diseases': {
+                'diabetes': 'Diabetes is a chronic condition that can be managed with medication, diet, and exercise. Try to work with a healthcare professional to develop a treatment plan.',
+                'hypertension': 'Hypertension is a chronic condition that can be managed with medication, diet, and exercise. Try to work with a healthcare professional to develop a treatment plan.',
+                'heart disease': 'Heart disease is a chronic condition that can be managed with medication, diet, and exercise. Try to work with a healthcare professional to develop a treatment plan.',
+                'cancer': 'Cancer is a serious disease that requires immediate medical attention. Try to seek medical attention if you experience symptoms of cancer.',
+                'alzheimer\'s disease': 'Alzheimer\'s disease is a chronic condition that can be managed with medication and therapy. Try to work with a healthcare professional to develop a treatment plan.',
+                'parkinson\'s disease': 'Parkinson\'s disease is a chronic condition that can be managed with medication and therapy. Try to work with a healthcare professional to develop a treatment plan.',
+                'multiple sclerosis': 'Multiple sclerosis is a chronic condition that can be managed with medication and therapy. Try to work with a healthcare professional to develop a treatment plan.'
+            }
+        };
+
+        symptomsBtn.addEventListener('click', () => {
+            currentTopic = 'symptoms';
+            displayOptions(topics[currentTopic]);
+        });
+
+        medicationBtn.addEventListener('click', () => {
+            currentTopic = 'medication';
+            displayOptions(topics[currentTopic]);
+        });
+
+        dietBtn.addEventListener('click', () => {
+            currentTopic = 'diet';
+            displayOptions(topics[currentTopic]);
+        });
+
+        exerciseBtn.addEventListener('click', () => {
+            currentTopic = 'exercise';
+            displayOptions(topics[currentTopic]);
+        });
+
+        mentalHealthBtn.addEventListener('click', () => {
+            currentTopic = 'mental-health';
+            displayOptions(topics[currentTopic]);
+        });
+
+        firstAidBtn.addEventListener('click', () => {
+            currentTopic = 'first-aid';
+            displayOptions(topics[currentTopic]);
+        });
+
+        healthTipsBtn.addEventListener('click', () => {
+            currentTopic = 'health-tips';
+            displayOptions(topics[currentTopic]);
+        });
+
+        diseasesBtn.addEventListener('click', () => {
+            currentTopic = 'diseases';
+            displayOptions(topics[currentTopic]);
+        });
+
+        sendBtn.addEventListener('click', () => {
+            const userMessage = chatInput.value;
+            const response = getResponse(userMessage, currentTopic);
+            displayMessage(userMessage, 'user');
+            displayMessage(response, 'bot');
+            chatInput.value = '';
+        });
+
+        function displayOptions(options) {
+            answersContainer.innerHTML = '';
+            options.forEach(option => {
+                const btn = document.createElement('button');
+                btn.textContent = option;
+                btn.classList.add('answer-btn', 'btn', 'btn-primary');
+                btn.addEventListener('click', () => {
+                    const response = answers[currentTopic][option.toLowerCase()];
+                    displayMessage(response, 'bot');
+                });
+                answersContainer.appendChild(btn);
+            });
+        }
+
+        function getResponse(userMessage, topic) {
+            const responses = answers[topic];
+            const keywords = Object.keys(responses);
+            const userMessageLower = userMessage.toLowerCase();
+            for (const keyword of keywords) {
+                if (userMessageLower.includes(keyword)) {
+                    return responses[keyword];
+                }
+            }
+            return 'I didn\'t understand your question. Please try again.';
+        }
+
+        function displayMessage(message, sender) {
+            const msg = document.createElement('div');
+            msg.textContent = message;
+            msg.classList.add(sender);
+            chatLog.appendChild(msg);
+            chatLog.scrollTop = chatLog.scrollHeight;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Appointments</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script>
+        // Function to validate the form
+        function validateForm() {
+            // Get the form field values
+            const doctorName = document.getElementById('doctor_name').value;
+            const patientName = document.getElementById('patient_name').value;
+            const appointmentTime = document.getElementById('appointment_time').value;
+
+            // Check if patient name is empty
+            if (!patientName) {
+                alert('Patient Name is required!');
+                return false; // Prevent form submission
+            }
+
+            // Check if appointment time is empty
+            if (!appointmentTime) {
+                alert('Appointment Time is required!');
+                return false; // Prevent form submission
+            }
+
+            // Confirm appointment creation
+            const confirmation = confirm(`Are you sure you want to book an appointment with Dr. ${doctorName}?`);
+            if (confirmation) {
+                alert('Appointment added successfully!');
+                return true; // Allow form submission
+            } else {
+                return false; // Prevent form submission
+            }
+        }
+    </script>
+</head>
+
+<style>
+    /* Your existing CSS styles */
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+    }
+
+    .container {
+        text-align: center;
+        padding: 20px;
+    }
+
+    .container h1 {
+        margin-bottom: 20px;
+    }
+
+    form {
+        width: 300px;
+        margin: 0 auto;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 10px;
+    }
+
+    select {
+        width: 100%;
+        padding: 8px 16px;
+        margin-bottom: 15px;
+        border: none;
+        outline: none;
+        color: #333;
+        background-color: #eee;
+        font-size: inherit;
+        cursor: pointer;
+        border-radius: 5px;
+    }
+
+    select:hover {
+        background-color: transparent;
+    }
+
+    input {
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+    }
+
+    button {
+        background-color: #333;
+        color: #fff;
+        padding: 10px 20px;
+        border: none;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background-color: #555;
+    }
+
+    a {
+        display: block;
+        text-align: center;
+        margin-top: 20px;
+    }
+</style>
+
+<body>
+    <div class="container">
+        <h1>Manage Appointments</h1>
+        <form method="post" onsubmit="return validateForm()"> <!-- Form validation on submission -->
+            <label for="doctor_name">Doctor Name:</label>
+            <select id="doctor_name" name="doctor_name">
+                {% for doctor in doctors %}
+                    <option value="{{ doctor.name }}">{{ doctor.name }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="patient_name">Patient Name:</label>
+            <input type="text" id="patient_name" name="patient_name" required>
+
+            <label for="appointment_time">Appointment Time:</label>
+            <input type="datetime-local" id="appointment_time" name="appointment_time" required>
+
+            <button type="submit">Add Appointment</button>
+        </form>
+        <a href="{{ url_for('admin_dashboard') }}">Back to Dashboard</a>
+    </div>
+</body>
+
+</html>

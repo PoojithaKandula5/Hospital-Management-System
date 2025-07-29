@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Request Appointment</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script>
+        // JavaScript to validate the form
+        function validateAppointmentForm() {
+            // Get form field values
+            const doctorId = document.getElementById('doctor_id').value;
+            const appointmentTime = document.getElementById('appointment_time').value;
+
+            // Check if doctor is selected
+            if (!doctorId) {
+                alert('Please select a doctor.');
+                return false; // Prevent form submission
+            }
+
+            // Check if appointment time is selected
+            if (!appointmentTime) {
+                alert('Please select an appointment time.');
+                return false; // Prevent form submission
+            }
+
+            // Confirmation alert
+            const confirmRequest = confirm('Do you want to request this appointment?');
+            if (!confirmRequest) {
+                return false; // Cancel form submission if user declines
+            }
+
+            // If everything is valid, show success message
+            alert('Appointment requested successfully!');
+            return true; // Allow form submission
+        }
+    </script>
+</head>
+
+<style>
+    /* Your existing CSS styles */
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+    }
+
+    .container {
+        text-align: center;
+        padding: 20px;
+    }
+
+    .container h1 {
+        margin-bottom: 20px;
+    }
+
+    form {
+        width: 300px;
+        margin: 0 auto;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 10px;
+    }
+
+    button,
+    .container a {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #333;
+        color: #fff;
+        text-decoration: none;
+        margin: 0 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    button:hover,
+    .container a:hover {
+        background-color: #555;
+    }
+
+    select,
+    input {
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    a {
+        display: block;
+        text-align: center;
+        margin-top: 20px;
+    }
+</style>
+
+<body>
+    <div class="container">
+        <h1>Request Appointment</h1>
+        <form method="post" onsubmit="return validateAppointmentForm()"> <!-- JavaScript validation on form submission -->
+            <label for="doctor_id">Doctor:</label>
+            <select id="doctor_id" name="doctor_id">
+                {% for doctor in doctors %}
+                    <option value="{{ doctor._id }}">{{ doctor.name }} - {{ doctor.specialization }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="appointment_time">Appointment Time:</label>
+            <input type="datetime-local" id="appointment_time" name="appointment_time" required>
+
+            <button type="submit">Request Appointment</button>
+        </form>
+        <a href="{{ url_for('user_dashboard') }}">Back to Dashboard</a>
+    </div>
+</body>
+
+</html>

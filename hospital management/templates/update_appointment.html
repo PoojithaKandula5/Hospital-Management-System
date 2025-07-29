@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Appointment</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script>
+        // JavaScript function to confirm appointment update
+        function confirmUpdate() {
+            const confirmation = confirm('Are you sure you want to update the appointment?');
+            return confirmation; // If true, form will be submitted; otherwise, it will be canceled
+        }
+
+        // JavaScript function to validate appointment time
+        function validateAppointmentTime() {
+            const appointmentTime = document.getElementById('appointment_time').value;
+            const currentTime = new Date().toISOString().slice(0, 16); // Current date and time in ISO format
+
+            if (appointmentTime < currentTime) {
+                alert('Appointment time must be in the future.');
+                return false; // Prevent form submission if appointment time is invalid
+            }
+            return true;
+        }
+
+        // JavaScript to combine confirmation and validation
+        function handleSubmit(event) {
+            if (!validateAppointmentTime() || !confirmUpdate()) {
+                event.preventDefault(); // Prevent form submission if any condition fails
+            }
+        }
+
+        // Add event listener to run these functions when the form is submitted
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.querySelector('form');
+            form.addEventListener('submit', handleSubmit);
+        });
+    </script>
+</head>
+
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+    }
+
+    .container {
+        text-align: center;
+        padding: 20px;
+    }
+
+    .container h1 {
+        margin-bottom: 20px;
+    }
+
+    form {
+        width: 300px;
+        margin: 0 auto;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 10px;
+    }
+
+    /* Style buttons (including submit and back to appointments) */
+    button,
+    .container a {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #333;
+        color: #fff;
+        text-decoration: none;
+        margin: 0 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease; /* Add transition for smooth hover effect */
+    }
+
+    button:hover,
+    .container a:hover {
+        background-color: #555;
+    }
+
+    /* Specific styles for the select element (optional) */
+    select {
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 5px; /* Match button radius for consistency */
+    }
+
+    input {
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+    }
+
+    /* Other styles (unchanged) */
+    a {
+        display: block;
+        text-align: center;
+        margin-top: 20px;
+    }
+</style>
+
+<body>
+    <div class="container">
+        <h1>Update Appointment</h1>
+        <form method="post">
+            <label for="doctor_name">Doctor Name:</label>
+            <select id="doctor_name" name="doctor_name">
+                {% for doctor in doctors %}
+                    <option value="{{ doctor.name }}" {% if doctor.name == appointment.doctor_name %}selected{% endif %}>{{ doctor.name }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="patient_name">Patient Name:</label>
+            <input type="text" id="patient_name" name="patient_name" value="{{ appointment.patient_name }}" required>
+
+            <label for="appointment_time">Appointment Time:</label>
+            <input type="datetime-local" id="appointment_time" name="appointment_time" value="{{ appointment.appointment_time }}" required>
+
+            <button type="submit">Update Appointment</button>
+        </form>
+        <a href="{{ url_for('view_appointments') }}">Back to Appointments</a>
+    </div>
+</body>
+</html>

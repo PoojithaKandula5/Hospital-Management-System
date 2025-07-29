@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script>
+        function validateRegistrationForm() {
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const role = document.getElementById('role').value;
+
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            if (name.length < 2) {
+                alert('Name must be at least 2 characters long.');
+                return false;
+            }
+
+            if (!email.match(emailPattern)) {
+                alert('Please enter a valid email address.');
+                return false;
+            }
+
+            if (password.length < 6) {
+                alert('Password must be at least 6 characters long.');
+                return false;
+            }
+
+            if (role === 'admin') {
+                const confirmAdmin = confirm('You have selected the Admin role. Are you sure?');
+                if (!confirmAdmin) {
+                    return false;
+                }
+            } else {
+                alert('You are registering as a User.');
+            }
+
+            alert('Registration successful!');
+            return true;
+        }
+    </script>
+</head>
+
+<style>
+    /* Background Image */
+    body {
+        background: url('https://th.bing.com/th/id/OIP.rfzYKMPhsGLSuTm0cxnIZQHaEK?rs=1&pid=ImgDetMain') no-repeat center center/cover;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        font-family: 'Poppins', sans-serif;
+        position: relative;
+    }
+
+    /* Soft Light Pink Overlay */
+    body::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 182, 193, 0.4); /* Light Pink Overlay */
+        z-index: 1;
+    }
+
+    /* Glassmorphism Container */
+    .container {
+        position: relative;
+        z-index: 2;
+        width: 450px;
+        padding: 30px;
+        background: rgba(255, 182, 193, 0.3); /* Light Pink Glass */
+        border-radius: 15px;
+        backdrop-filter: blur(12px);
+        box-shadow: 0px 4px 15px rgba(255, 105, 180, 0.3); /* Soft Pink Glow */
+        text-align: center;
+        animation: fadeIn 1s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: scale(0.9); }
+        to { opacity: 1; transform: scale(1); }
+    }
+
+    /* Heading */
+    h1 {
+        font-size: 28px;
+        color: #ff69b4; /* Hot Pink */
+        text-shadow: 2px 2px 8px rgba(255, 105, 180, 0.6);
+        margin-bottom: 20px;
+    }
+
+    /* Form Styling */
+    form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    label {
+        font-weight: bold;
+        margin-bottom: 5px;
+        width: 100%;
+        text-align: left;
+        color: #fff;
+    }
+
+    input, select {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 15px;
+        border: none;
+        border-radius: 8px;
+        outline: none;
+        font-size: 16px;
+        background: rgba(255, 255, 255, 0.4);
+        color: #ff69b4;
+        transition: 0.3s;
+        box-shadow: inset 2px 2px 5px rgba(255, 255, 255, 0.2), inset -2px -2px 5px rgba(255, 20, 147, 0.2);
+    }
+
+    input:focus, select:focus {
+        background-color: rgba(255, 255, 255, 0.6);
+        border: 1px solid #ff1493;
+    }
+
+    /* Button Styling */
+    button {
+        padding: 12px 25px;
+        font-size: 18px;
+        font-weight: bold;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: 0.3s;
+        background: linear-gradient(45deg, #ffb6c1, #ff69b4);
+        color: white;
+        box-shadow: 3px 3px 10px rgba(255, 105, 180, 0.3);
+    }
+
+    button:hover {
+        background: linear-gradient(45deg, #ff69b4, #ff1493);
+        transform: scale(1.05);
+    }
+
+    /* Login Link */
+    a {
+        display: inline-block;
+        margin-top: 15px;
+        font-size: 16px;
+        font-weight: bold;
+        text-decoration: none;
+        color: #ff1493;
+        transition: 0.3s;
+    }
+
+    a:hover {
+        color: #ff4500;
+        transform: scale(1.05);
+    }
+</style>
+
+<body>
+    <div class="container">
+        <h1>🌸 Register Here 🌸</h1>
+        <form method="post" onsubmit="return validateRegistrationForm()">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required>
+
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+
+            <label for="role">Role:</label>
+            <select id="role" name="role">
+                <option value="user">User</option>
+                <option value="admin">Admin</option>
+            </select>
+
+            <button type="submit">Register</button>
+        </form>
+        <a href="{{ url_for('login') }}">Already have an account? Login</a>
+    </div>
+</body>
+
+</html>
